@@ -24,7 +24,12 @@ func (walker *fileWalker) visit(path string, f os.FileInfo, err error) error {
 	if err != nil {
 		return err
 	}
-	if strings.HasPrefix(path, ".") || !f.Mode().IsRegular() {
+	fileName := filepath.Base(path)
+	if strings.EqualFold(fileName, "node_modules") || strings.HasPrefix(fileName, ".") {
+		dlog.Infof("Skipping [%v]", path)
+		return filepath.SkipDir
+	}
+	if !f.Mode().IsRegular() {
 		return nil
 	}
 	walkedFile := WalkedFile{
