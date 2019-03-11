@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -72,7 +73,8 @@ func (instance *TerrariumInstance) Status() (*TerrariumStatusResponse, error) {
 	var statusResponse TerrariumStatusResponse
 	err = json.Unmarshal(bin, &statusResponse)
 	if err != nil {
-		return nil, err
+		time.Sleep(5 * time.Second)
+		return nil, fmt.Errorf("Unexpected response from the server (with status code: %v)", resp.StatusCode)
 	}
 	return &statusResponse, nil
 }
@@ -185,7 +187,8 @@ func NewTerrariumInstance(root string, language string) (*TerrariumInstance, err
 	var uploadResponse TerrariumUploadResponse
 	err = json.Unmarshal(bin, &uploadResponse)
 	if err != nil {
-		return nil, err
+		time.Sleep(5 * time.Second)
+		return nil, fmt.Errorf("Unexpected response from the server (with status code: %v)", resp.StatusCode)
 	}
 	dlog.Notice("Upload done, compilation in progress...")
 	terrariumInstance := TerrariumInstance{ID: uploadResponse.ID}
