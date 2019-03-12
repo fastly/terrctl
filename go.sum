@@ -1,0 +1,6 @@
+github.com/hashicorp/go-syslog v1.0.0 h1:KaodqZuhUoZereWVIYmpUgZysurB1kBLX2j0MwMrUAE=
+github.com/hashicorp/go-syslog v1.0.0/go.mod h1:qPfqrKkXGihmCqbJM2mZgkZGvKG1dFdvsLplgctolz4=
+github.com/jedisct1/dlog v0.0.0-20181221013014-794eb21b6ae8 h1:0iA8hZt8f9GRhk/VgKKfNfzIZGNjQ018bmvN7Mou3bI=
+github.com/jedisct1/dlog v0.0.0-20181221013014-794eb21b6ae8/go.mod h1:o5Z+fp7fcua7ZzPE8+4v8MOG5MnSAmWaAh1d0WROuXA=
+golang.org/x/sys v0.0.0-20190311152110-c8c8c57fd1e1 h1:FQNj2xvjQ1lgFyzbSybGZr792Y8Dy95D7uuqnZAzNaA=
+golang.org/x/sys v0.0.0-20190311152110-c8c8c57fd1e1/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
