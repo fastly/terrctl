@@ -45,6 +45,11 @@ script:
 - ln terrctl freebsd-arm/
 - tar czpvf terrctl-freebsd_arm-${TRAVIS_TAG:-dev}.tar.gz freebsd-arm
 - go clean
+- env GOOS=freebsd GOARCH=arm GOARM=7 go build -ldflags="-s -w"
+- mkdir freebsd-armv7
+- ln terrctl freebsd-armv7/
+- tar czpvf terrctl-freebsd_armv7-${TRAVIS_TAG:-dev}.tar.gz freebsd-armv7
+- go clean
 - env GOOS=dragonfly GOARCH=amd64 go build -ldflags="-s -w"
 - mkdir dragonflybsd-amd64
 - ln terrctl dragonflybsd-amd64/
