@@ -15,16 +15,17 @@ type Severity int32
 
 type globals struct {
 	sync.Mutex
-	logLevel       Severity
-	useSyslog      *bool
-	appName        string
-	syslogFacility string
-	systemLogger   *systemLogger
-	fileName       *string
-	outFd          *os.File
-	lastMessage    string
-	lastOccurrence time.Time
-	occurrences    uint64
+	logLevel        Severity
+	useSyslog       *bool
+	truncateLogFile *bool
+	appName         string
+	syslogFacility  string
+	systemLogger    *systemLogger
+	fileName        *string
+	outFd           *os.File
+	lastMessage     string
+	lastOccurrence  time.Time
+	occurrences     uint64
 }
 
 var (
@@ -149,9 +150,10 @@ func Init(appName string, logLevel Severity, syslogFacility string) error {
 	}
 	_globals.appName = appName
 	_globals.syslogFacility = syslogFacility
-	_globals.useSyslog = flag.Bool("syslog", false, "Send logs to the local system logger (Eventlog on Windows, syslog on Unix)")
-	_globals.fileName = flag.String("logfile", "", "Write logs to file")
-	flag.Var(&_globals.logLevel, "loglevel", fmt.Sprintf("Log level (%d-%d)", SeverityDebug, SeverityFatal))
+	_globals.useSyslog = flag.Bool("syslog", false, "Send application logs to the local system logger (Eventlog on Windows, syslog on Unix)")
+	_globals.fileName = flag.String("logfile", "", "Write application logs to file")
+	_globals.truncateLogFile = flag.Bool("logfile-truncate", false, "Truncate the application log file; keep only data from the most recent application launch")
+	flag.Var(&_globals.logLevel, "loglevel", fmt.Sprintf("Application log level (%d-%d)", SeverityDebug, SeverityFatal))
 	return nil
 }
 
@@ -174,13 +176,19 @@ func UseSyslog(value bool) {
 	_globals.Unlock()
 }
 
+func TruncateLogFile(value bool) {
+	_globals.Lock()
+	_globals.truncateLogFile = &value
+	_globals.Unlock()
+}
+
 func UseLogFile(fileName string) {
 	_globals.Lock()
 	_globals.fileName = &fileName
 	_globals.Unlock()
 }
 
-func GetFileDescriptor() (*os.File) {
+func GetFileDescriptor() *os.File {
 	_globals.Lock()
 	createFileDescriptor()
 	_globals.Unlock()
@@ -195,7 +203,13 @@ func SetFileDescriptor(fd *os.File) {
 
 func createFileDescriptor() {
 	if _globals.fileName != nil && len(*_globals.fileName) > 0 && _globals.outFd == nil {
-		outFd, err := os.OpenFile(*_globals.fileName, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0644)
+		mode := os.O_WRONLY | os.O_CREATE
+		if _globals.truncateLogFile != nil && *_globals.truncateLogFile {
+			mode |= os.O_TRUNC
+		} else {
+			mode |= os.O_APPEND
+		}
+		outFd, err := os.OpenFile(*_globals.fileName, mode, 0644)
 		if err == nil {
 			_globals.outFd = outFd
 		}
